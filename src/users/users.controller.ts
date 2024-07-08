@@ -9,6 +9,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Request() req) {
-    return this.usersService.findOne(req.user.userId);
+    const user = await this.usersService.findOne(req.user.userId);
+    return { nickname: user.nickname, points: user.points };
   }
 }

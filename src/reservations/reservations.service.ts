@@ -46,6 +46,27 @@ export class ReservationsService {
     return this.reservationsRepository.save(reservation);
   }
 
+  async cancel(userId: string, reservationId: string): Promise<void> {
+    const reservation = await this.reservationsRepository.findOne({
+      where: { id: reservationId, user: { id: userId } },
+      relations: ['concert'],
+    });
+
+    if (!reservation) {
+      throw new Error('Reservation not found');
+    }
+
+    const user = reservation.user;
+    const concert = reservation.concert;
+
+    user.points += concert.price;
+    concert.seat_count += 1;
+
+    await this.usersRepository.save(user);
+    await this.concertsRepository.save(concert);
+    await this.reservationsRepository.remove(reservation);
+  }
+
   async findAllByUser(userId: string): Promise<Reservation[]> {
     return this.reservationsRepository.find({
       where: { user: { id: userId } },

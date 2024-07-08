@@ -11,6 +11,9 @@ export class ConcertsService {
   ) {}
 
   async create(concert: any): Promise<Concert> {
+    if (concert.price > 50000) {
+      throw new Error('한 좌석 당 50000 포인트까지 사용가능합니다');
+    }
     return this.concertsRepository.save(concert);
   }
 
@@ -23,6 +26,6 @@ export class ConcertsService {
   }
 
   async searchByName(name: string): Promise<Concert[]> {
-    return this.concertsRepository.find({ where: { name: name } });
+    return this.concertsRepository.find({ where: { name } });
   }
 }
